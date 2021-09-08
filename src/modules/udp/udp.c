@@ -17,6 +17,7 @@ MODULE_VERSION
 
 static int udp_send(struct sip_msg* msg, char* txt);
 static int mod_init(void);
+
 char *udp_srv_str;
 
 int udpsend_socket;
@@ -40,12 +41,10 @@ struct module_exports exports = {
 	0,        /* RPC methods */
 	0,        /* response function*/
 	0,        /* destroy function */
-
 	mod_init, /* module initialization function */
 	0,        /* oncancel function */
 	0         /* per-child init function */
 };
-
 
 static int mod_init(void)
 {
@@ -53,7 +52,7 @@ static int mod_init(void)
 	char* destination;
 	char* port;
 	unsigned int len = 0;
-	
+
 	if(udp_srv_str == NULL){
 		WARN("Invalid destination");
 		return -1;
@@ -66,8 +65,9 @@ static int mod_init(void)
 		WARN("Invalid destination");
 		return -1;
 	}
-	
+
 	destination = pkg_malloc(len);
+
 	if (destination == NULL) {
 		PKG_MEM_ERROR;
 		return -1;
@@ -75,24 +75,26 @@ static int mod_init(void)
 
 	strncpy(destination, udp_srv_str, len);
 	destination[len] = '\0';
-	
-  udpsend_addr.sin_family = AF_INET;
+
+	udpsend_addr.sin_family = AF_INET;
+
 	ret = inet_aton(destination, &udpsend_addr.sin_addr);
+
 	if (ret == 0) { 
 		WARN("Invalid destination");
 		return -1;
 	}
-  udpsend_addr.sin_port = htons(atoi(port));
- 
+
+	udpsend_addr.sin_port = htons(atoi(port));
 	udpsend_socket = socket(PF_INET, SOCK_DGRAM, 0);
-  if (udpsend_socket == -1) { 
+
+	if (udpsend_socket == -1) { 
 		WARN("Could not create socket");
 		return -1;
 	}
-	
+
 	return 0;
 }
-
 
 static int udp_send(struct sip_msg* msg, char* txt)
 {
@@ -104,4 +106,3 @@ static int udp_send(struct sip_msg* msg, char* txt)
 	}
 	return 1;
 }
-
